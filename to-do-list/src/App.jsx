@@ -1,14 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
-
 
 function App() {
   const [tasks, setTasks] = useState([])
   const [newTask, setNewTask] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [filter, setFilter] = useState('all')
+
+  useEffect(() => {
+    fetch("http://localhost:5000/tasks")
+      .then(res => res.json())
+      .then(data => {
+        setTasks(data.data);
+        setFilter(data.data)
+      })
+      .catch(err => console.log(err))
+  }, [])
+
+
 
   const filteredTasks = tasks.filter(task => filter === 'all' ? true : filter === 'completed' ? task.completed : !task.completed)
 
@@ -23,7 +34,7 @@ function App() {
               className="mb-4"
               onSubmit={(e) => {
                 e.preventDefault();
-                setTasks([...tasks, { text: newTask, description: newDescription, completed: false }]);
+                setTasks([...tasks, { title: newTask, description: newDescription, completed: false }]);
                 setNewTask('');
                 setNewDescription('');
               }}
@@ -49,7 +60,29 @@ function App() {
                   />
                 </div>
                 <div className="col-12 text-center">
-                  <button className='btn btn-primary w-50 rounded-3 shadow' type="submit">
+                  <button className='btn btn-primary w-50 rounded-3 shadow' type="submit"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('http://localhost:5000/tasks/create', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({ title: newTask, description: newDescription })
+                        })
+                        if (!response.ok) {
+                          throw new Error('Error al crear la tarea')
+                        }
+                        const data = await response.json()
+                        console.log(data)
+                        setTasks([...tasks, data.data])
+                        setNewTask('')
+                        setNewDescription('')
+                      } catch (err) {
+                        console.log(err)
+                      }
+                    }}
+                  >
                     ➕ Agregar tarea
                   </button>
                 </div>
@@ -68,30 +101,79 @@ function App() {
 
             {/* Lista de tareas */}
             <ul className='list-group'>
-              {filteredTasks.map((task, index) =>
+              {(filteredTasks || []).map((task, index) =>
                 <li
                   key={index}
                   className={`list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm ${task.completed ? 'list-group-item-success' : ''}`}
                 >
                   <div>
+                    {/* Tarea */}
                     <span className={`fw-semibold ${task.completed ? 'text-decoration-line-through text-muted' : ''}`}>
-                      {task.text}
+                      {task.title}
                     </span>
+                    {/* Descripción */}
                     {task.description && <small className="d-block text-muted fst-italic">📝 {task.description}</small>}
+                    {/* Fecha de creación */}
+                    {task.createdAt && <small className="d-block text-muted fst-italic">📅 {task.createdAt}</small>}
                   </div>
 
-                  <div>
+                  <div >
+                    {/* Botones de acciones */}
                     {!task.completed && (
                       <>
+                        {/* Eliminar una tarea */}
                         <button
                           className='btn btn-danger btn-sm rounded-circle mx-1 shadow-sm'
-                          onClick={() => setTasks(tasks.filter(t => t.text !== task.text))}
+                          onClick={async () => {
+                            setTasks(tasks.filter(t => t.title !== task.title))
+                            try {
+                              const response = await fetch(`http://localhost:5000/tasks/delete/${task._id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                  'Content-Type': 'application/json'
+                                },
+                              })
+                              if (!response.ok) {
+                                throw new Error('Error al eliminar la tarea')
+                              }
+                              const data = await response.json()
+                              console.log(data)
+                            } catch (err) {
+                              console.log(err)
+                            }
+                          }}
                         >
                           <i className="fa fa-times"></i>
                         </button>
+                        {/* Editar una tarea */}
+                        <button
+                          className='btn btn-warning btn-sm rounded-circle mx-1 shadow-sm'
+                          onClick={() => setTasks(tasks.map(t => t.title === task.title ? { ...t, completed: !t.completed } : t))}
+                        >
+                          <i class="fa fa-pencil-square" aria-hidden="true"></i>
+                        </button>
+                        {/* Completar una tarea */}
                         <button
                           className='btn btn-success btn-sm rounded-circle mx-1 shadow-sm'
-                          onClick={() => setTasks(tasks.map(t => t.text === task.text ? { ...t, completed: !t.completed } : t))}
+                          onClick={async () => {
+                            setTasks(tasks.map(t => t.title === task.title ? { ...t, completed: !t.completed } : t))
+                            try {
+                              const response = await fetch(`http://localhost:5000/tasks/update/${task._id}`, {
+                                method: 'PUT',
+                                headers: {
+                                  'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ completed: !task.completed })
+                              })
+                              if (!response.ok) {
+                                throw new Error('Error al actualizar la tarea')
+                              }
+                              const data = await response.json()
+                              console.log(data)
+                            } catch (err) {
+                              console.log(err)
+                            }
+                          }}
                         >
                           <i className="fa fa-check"></i>
                         </button>
@@ -100,6 +182,29 @@ function App() {
                     {task.completed && (
                       <span className="badge bg-success px-3 py-2 rounded-pill">
                         ✅ Completada
+                        <button
+                          className='btn btn-danger btn-sm rounded-circle mx-1 shadow-sm'
+                          onClick={async () => {
+                            setTasks(tasks.filter(t => t.title !== task.title))
+                            try {
+                              const response = await fetch(`http://localhost:5000/tasks/delete/${task._id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                  'Content-Type': 'application/json'
+                                },
+                              })
+                              if (!response.ok) {
+                                throw new Error('Error al eliminar la tarea')
+                              }
+                              const data = await response.json()
+                              console.log(data)
+                            } catch (err) {
+                              console.log(err)
+                            }
+                          }}
+                        >
+                          <i className="fa fa-times"></i>
+                        </button>
                       </span>
                     )}
                   </div>

@@ -9,17 +9,47 @@ const loginEmail = ref('')
 const loginPassword = ref('')
 
 // Datos del registro
-const registerName = ref('')
-const registerEmail = ref('')
-const registerPassword = ref('')
+const fullName = ref('')
+const email = ref('')
+const password = ref('')
 
 // Funciones
-const handleLogin = () => {
-  alert(`Iniciando sesión con:\nEmail: ${loginEmail.value}\nPassword: ${loginPassword.value}`)
+const handleLogin = async() => {
+    try {
+        const response = await fetch(`http://localhost:5000/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: loginEmail.value, password: loginPassword.value })
+        })
+        if (!response.ok) {
+            throw new Error('Error al iniciar sesión')
+        }
+        const data = await response.json()
+        console.log(data)
+    } catch (error) {
+        console.log(error)
+    }
 }
 
-const handleRegister = () => {
-  alert(`Registrando usuario:\nNombre: ${registerName.value}\nEmail: ${registerEmail.value}\nPassword: ${registerPassword.value}`)
+const handleRegister = async() => {
+    try {
+        const response = await fetch(`http://localhost:5000/users/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fullName: fullName.value, email: email.value, password: password.value })
+        })
+        if (!response.ok) {
+            throw new Error('Error al registrar el usuario')
+        }
+        const data = await response.json()
+        console.log(data)
+    } catch (error) {
+        console.log(error)
+    }
 }
 </script>
 
@@ -66,15 +96,15 @@ const handleRegister = () => {
         <h3 class="mb-3">Crear Cuenta</h3>
         <div class="mb-3">
           <label class="form-label">Nombre</label>
-          <input v-model="registerName" type="text" class="form-control" placeholder="Tu nombre">
+          <input v-model="fullName" type="text" class="form-control" placeholder="Tu nombre">
         </div>
         <div class="mb-3">
           <label class="form-label">Email</label>
-          <input v-model="registerEmail" type="email" class="form-control" placeholder="ejemplo@mail.com">
+          <input v-model="email" type="email" class="form-control" placeholder="ejemplo@mail.com">
         </div>
         <div class="mb-3">
           <label class="form-label">Contraseña</label>
-          <input v-model="registerPassword" type="password" class="form-control" placeholder="********">
+          <input v-model="password" type="password" class="form-control" placeholder="********">
         </div>
         <button class="btn btn-primary w-100" @click="handleRegister">Registrarse</button>
       </div>
