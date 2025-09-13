@@ -28,7 +28,7 @@ const handleLogin = async() => {
             throw new Error('Error al iniciar sesión')
         }
         await response.json();
-        window.location.href = '/';
+        window.location.href = '/app';
     } catch (error) {
         console.log(error)
     }
