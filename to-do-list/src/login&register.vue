@@ -27,8 +27,8 @@ const handleLogin = async() => {
         if (!response.ok) {
             throw new Error('Error al iniciar sesión')
         }
-        const data = await response.json()
-        console.log(data)
+        await response.json();
+        window.location.href = '/';
     } catch (error) {
         console.log(error)
     }
@@ -46,8 +46,8 @@ const handleRegister = async() => {
         if (!response.ok) {
             throw new Error('Error al registrar el usuario')
         }
-        const data = await response.json()
-        console.log(data)
+        await response.json();
+        activeTab.value = 'login'
     } catch (error) {
         console.log(error)
     }
@@ -89,7 +89,7 @@ const handleRegister = async() => {
           <label class="form-label">Contraseña</label>
           <input v-model="loginPassword" type="password" class="form-control" placeholder="********">
         </div>
-        <button class="btn btn-success w-100" @click="handleLogin">Entrar</button>
+        <button class="btn btn-success w-100" @click="handleLogin" v-if="activeTab === 'login'">Entrar</button>
       </div>
 
       <!-- Registro -->
