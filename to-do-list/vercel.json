@@ -1,8 +1,9 @@
 {
-    "rewrites": [
+    "redirects": [
         {
             "source": "/",
-            "destination": "/LoginRegister.html"
+            "destination": "/LoginRegister.html",
+            "permanent": true
         }
     ]
 }
