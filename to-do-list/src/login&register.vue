@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import { Routes } from './config/index.js'
 
 const activeTab = ref('login')
 
@@ -16,7 +17,7 @@ const password = ref('')
 // Funciones
 const handleLogin = async() => {
     try {
-        const response = await fetch(`http://localhost:5000/users/login`, {
+        const response = await fetch(`${Routes.Login}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -35,7 +36,7 @@ const handleLogin = async() => {
 
 const handleRegister = async() => {
     try {
-        const response = await fetch(`http://localhost:5000/users/register`, {
+        const response = await fetch(`${Routes.Register}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

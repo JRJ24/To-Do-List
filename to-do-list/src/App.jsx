@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
+import { Routes } from './config/index.js'
 
 function App() {
   const [tasks, setTasks] = useState([])
@@ -10,7 +11,7 @@ function App() {
   const [filter, setFilter] = useState('all')
 
   useEffect(() => {
-    fetch("http://localhost:5000/tasks")
+    fetch(Routes.Task)
       .then(res => res.json())
       .then(data => {
         setTasks(data.data);
@@ -63,7 +64,7 @@ function App() {
                   <button className='btn btn-primary w-50 rounded-3 shadow' type="submit"
                     onClick={async () => {
                       try {
-                        const response = await fetch('http://localhost:5000/tasks/create', {
+                        const response = await fetch(`${Routes.CreateTask}`, {
                           method: 'POST',
                           headers: {
                             'Content-Type': 'application/json'
@@ -127,7 +128,7 @@ function App() {
                           onClick={async () => {
                             setTasks(tasks.filter(t => t.title !== task.title))
                             try {
-                              const response = await fetch(`http://localhost:5000/tasks/delete/${task._id}`, {
+                              const response = await fetch(`${Routes.DeleteTask}/${task._id}`, {
                                 method: 'DELETE',
                                 headers: {
                                   'Content-Type': 'application/json'
@@ -136,8 +137,7 @@ function App() {
                               if (!response.ok) {
                                 throw new Error('Error al eliminar la tarea')
                               }
-                              const data = await response.json()
-                              console.log(data)
+                              await response.json()
                             } catch (err) {
                               console.log(err)
                             }
@@ -148,7 +148,28 @@ function App() {
                         {/* Editar una tarea */}
                         <button
                           className='btn btn-warning btn-sm rounded-circle mx-1 shadow-sm'
-                          onClick={() => setTasks(tasks.map(t => t.title === task.title ? { ...t, completed: !t.completed } : t))}
+                          onClick={async() => {
+                            const title = prompt('Ingrese el nuevo titulo', task.title)
+                            const description = prompt('Ingrese la nueva descripcion', task.description)
+                            try{
+                              const response = await fetch(`${Routes.UpdateTask}/${task._id}`, {
+                                method: 'PUT',
+                                headers: {
+                                  'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ title: title, description: description })
+                              })
+                              if (!response.ok) {
+                                throw new Error('Error al actualizar la tarea')
+                              }
+                              await response.json()
+                              setTasks(prev =>
+                                prev.map(t => (t._id === task._id ? { ...t, title, description } : t))
+                              );
+                            }catch(err){
+                              console.log(err);
+                            }
+                          }}
                         >
                           <i class="fa fa-pencil-square" aria-hidden="true"></i>
                         </button>
@@ -158,7 +179,7 @@ function App() {
                           onClick={async () => {
                             setTasks(tasks.map(t => t.title === task.title ? { ...t, completed: !t.completed } : t))
                             try {
-                              const response = await fetch(`http://localhost:5000/tasks/update/${task._id}`, {
+                              const response = await fetch(`${Routes.UpdateTask}/${task._id}`, {
                                 method: 'PUT',
                                 headers: {
                                   'Content-Type': 'application/json'
@@ -168,8 +189,7 @@ function App() {
                               if (!response.ok) {
                                 throw new Error('Error al actualizar la tarea')
                               }
-                              const data = await response.json()
-                              console.log(data)
+                              await response.json()
                             } catch (err) {
                               console.log(err)
                             }
@@ -187,7 +207,7 @@ function App() {
                           onClick={async () => {
                             setTasks(tasks.filter(t => t.title !== task.title))
                             try {
-                              const response = await fetch(`http://localhost:5000/tasks/delete/${task._id}`, {
+                              const response = await fetch(`${Routes.DeleteTask}/${task._id}`, {
                                 method: 'DELETE',
                                 headers: {
                                   'Content-Type': 'application/json'
@@ -196,8 +216,7 @@ function App() {
                               if (!response.ok) {
                                 throw new Error('Error al eliminar la tarea')
                               }
-                              const data = await response.json()
-                              console.log(data)
+                              await response.json()
                             } catch (err) {
                               console.log(err)
                             }
