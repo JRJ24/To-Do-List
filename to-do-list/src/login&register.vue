@@ -25,6 +25,7 @@ const handleLogin = async() => {
             body: JSON.stringify({ email: loginEmail.value, password: loginPassword.value })
         })
         if (!response.ok) {
+            prompt('Usuario o contraseña incorrectos');
             throw new Error('Error al iniciar sesión')
         }
         const data = await response.json();
@@ -45,6 +46,7 @@ const handleRegister = async() => {
             body: JSON.stringify({ fullName: fullName.value, email: email.value, password: password.value })
         })
         if (!response.ok) {
+            prompt('El usuario ya existe, por favor inicie sesión');
             throw new Error('Error al registrar el usuario')
         }
         await response.json();
