@@ -63,8 +63,11 @@ Nota: En Vite las variables públicas deben empezar con `VITE_` para ser expuest
 
 El proyecto se encuentra desplegado en Vercel y funciona como un web service, lo que permite acceder a la aplicación directamente desde la nube sin necesidad de infraestructura propia.
 
+Login
 https://to-do-list-drab-beta-20.vercel.app/LoginRegister.html
 
+App
+https://to-do-list-drab-beta-20.vercel.app/index.html
 
 ## Contribuciones
 
