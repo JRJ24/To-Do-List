@@ -9,6 +9,8 @@ function App() {
   const [newTask, setNewTask] = useState('')
   const [newDescription, setNewDescription] = useState('')
   const [filter, setFilter] = useState('all')
+  const usuarioID = localStorage.getItem('usuarioID');
+
 
   useEffect(() => {
     fetch(Routes.Task)
@@ -22,7 +24,9 @@ function App() {
 
 
 
-  const filteredTasks = tasks.filter(task => filter === 'all' ? true : filter === 'completed' ? task.completed : !task.completed)
+  const filteredTasks = tasks.filter(task => filter === 'all' ? true : filter === 'completed' ? task.completed : !task.completed);
+  // const filteredTasksByUser = tasks.filter(task => task.user._id === usuarioID);
+ 
 
   return (
     <>
@@ -69,7 +73,7 @@ function App() {
                           headers: {
                             'Content-Type': 'application/json'
                           },
-                          body: JSON.stringify({ title: newTask, description: newDescription })
+                          body: JSON.stringify({ title: newTask, description: newDescription, user: usuarioID })
                         })
                         if (!response.ok) {
                           throw new Error('Error al crear la tarea')
@@ -102,7 +106,7 @@ function App() {
 
             {/* Lista de tareas */}
             <ul className='list-group'>
-              {(filteredTasks || []).map((task, index) =>
+              {(filteredTasks || []).map((task, index) => 
                 <li
                   key={index}
                   className={`list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2 shadow-sm ${task.completed ? 'list-group-item-success' : ''}`}
@@ -231,7 +235,7 @@ function App() {
               )}
               {filteredTasks.length === 0 && (
                 <li className='list-group-item text-center text-muted py-3 rounded-3 shadow-sm'>
-                  🎉 No hay tareas
+                  🎉 No hay tareas para mostrar de este usuario
                 </li>
               )}
             </ul>

@@ -27,7 +27,8 @@ const handleLogin = async() => {
         if (!response.ok) {
             throw new Error('Error al iniciar sesión')
         }
-        await response.json();
+        const data = await response.json();
+        localStorage.setItem('usuarioID', data.data._id);
         window.location.href = '/app';
     } catch (error) {
         console.log(error)
